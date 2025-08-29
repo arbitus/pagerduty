@@ -17,28 +17,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TeamController.class)
 class TeamControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private TeamRepository teamRepository;
-    @MockBean
-    private TeamMapper teamMapper;
+        @Autowired
+        private MockMvc mockMvc;
+        @MockBean
+        private TeamRepository teamRepository;
+        @MockBean
+        private TeamMapper teamMapper;
 
-    @Test
-    void testGetAllTeams() throws Exception {
-        TeamEntity team = new TeamEntity();
-        team.setId("team1");
-        team.setSummary("Team");
-        org.springframework.data.domain.PageImpl<TeamEntity> page = new org.springframework.data.domain.PageImpl<>(
-                Collections.singletonList(team));
-        Mockito.when(teamRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
-                .thenReturn(page);
-        com.example.pagerduty.dto.TeamDto dto = new com.example.pagerduty.dto.TeamDto();
-        dto.setId("team1");
-        dto.setSummary("Team");
-        Mockito.when(teamMapper.toDto(team)).thenReturn(dto);
-        mockMvc.perform(get("/api/v1/teams"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id").value("team1"));
-    }
+        @Test
+        void testGetAllTeams() throws Exception {
+                TeamEntity team = new TeamEntity();
+                team.setId("team1");
+                team.setSummary("Team");
+                org.springframework.data.domain.PageImpl<TeamEntity> page = new org.springframework.data.domain.PageImpl<>(
+                                Collections.singletonList(team));
+                Mockito.when(teamRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                                .thenReturn(page);
+                com.example.pagerduty.dto.TeamDto dto = new com.example.pagerduty.dto.TeamDto();
+                dto.setId("team1");
+                dto.setSummary("Team");
+                Mockito.when(teamMapper.toDto(team)).thenReturn(dto);
+                mockMvc.perform(get("/api/v1/teams"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.content[0].id").value("team1"));
+        }
 }

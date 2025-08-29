@@ -1,6 +1,10 @@
 package com.example.pagerduty.controller;
 
 import com.example.pagerduty.controller.ServiceController;
+import com.example.pagerduty.exception.ApiExceptionHandler;
+import org.springframework.context.annotation.Import;
+import com.example.pagerduty.exception.ApiExceptionHandler;
+import org.springframework.context.annotation.Import;
 import com.example.pagerduty.repository.ServiceRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +29,10 @@ class ServiceControllerErrorTest {
         Mockito.when(serviceRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
                 .thenThrow(new RuntimeException("DB error"));
         mockMvc.perform(get("/api/v1/services"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.error")
+                        .value("Internal Server Error"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.message")
+                        .value("Internal error: DB error"));
     }
 }

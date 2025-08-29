@@ -1,85 +1,86 @@
+
 # PagerDuty Integration Platform
 
-Este proyecto integra PagerDuty con una arquitectura moderna basada en Spring Boot, MySQL, Docker y React. Permite sincronizar servicios, equipos y políticas de escalamiento desde PagerDuty y visualizarlos en un dashboard profesional.
+This project integrates PagerDuty with a modern architecture based on Spring Boot, MySQL, Docker, and React. It allows you to synchronize services, teams, and escalation policies from PagerDuty and visualize them in a professional dashboard.
 
-## Requisitos previos
-- Docker y Docker Compose instalados
-- Acceso a un token de API de PagerDuty
+## Prerequisites
+- Docker and Docker Compose installed
+- Access to a PagerDuty API token
 
-## Estructura del proyecto
+## Project Structure
 ```
 ├── backend (Spring Boot)
 ├── frontend (React)
 ├── docker-compose.yml
-├── .env
+├── .env (must be created manually)
 ```
 
-## Configuración inicial
-1. **Clona el repositorio**
-2. **Configura las variables sensibles**
-   - Edita el archivo `.env` en la raíz y coloca tu token de PagerDuty y credenciales de base de datos:
+## Initial Setup
+1. **Clone the repository**
+2. **Configure sensitive variables**
+   - Create the `.env` file in the root directory and add your PagerDuty token and database credentials:
      ```
-     PAGERDUTY_API_TOKEN=tu_token
+     PAGERDUTY_API_TOKEN=your_token
      PAGERDUTY_API_URL=https://api.pagerduty.com
      SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/pagerduty?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
      SPRING_DATASOURCE_USERNAME=user
      SPRING_DATASOURCE_PASSWORD=password
      ```
-   - **No subas el archivo `.env` al repositorio.**
+   - **Do not commit the `.env` file to the repository.**
 
-## Arranque del proyecto
-1. **Levanta todos los servicios con Docker Compose:**
+## Starting the Project
+1. **Start all services with Docker Compose:**
    ```
    docker compose up -d --build
    ```
-   Esto inicia:
-   - Backend Spring Boot en el puerto 8080
-   - Base de datos MySQL en el puerto 3306
-   - Frontend React en el puerto 3000
+   This will start:
+   - Spring Boot backend on port 8080
+   - MySQL database on port 3306
+   - React frontend on port 3000
 
-2. **Accede al dashboard:**
-   - Abre tu navegador en [http://localhost:3000](http://localhost:3000)
-   - Verás el dashboard con menú lateral y las entidades sincronizadas.
+2. **Access the dashboard:**
+   - Open your browser at [http://localhost:3000](http://localhost:3000)
+   - You will see the dashboard with a sidebar menu and synchronized entities.
 
-## Funcionalidades principales
-- **Sincronización:**
-  - Botón "Sincronizar PagerDuty" para importar servicios, equipos y políticas desde la API de PagerDuty.
-  - Los datos se actualizan automáticamente en el dashboard tras la sincronización.
-- **Visualización:**
-  - Tablas dinámicas para servicios, equipos y políticas.
-  - Menú lateral para navegar entre entidades.
-  - Estilo profesional basado en la paleta de colores de PagerDuty.
+## Main Features
+- **Synchronization:**
+  - "Synchronize PagerDuty" button to import services, teams, and policies from the PagerDuty API.
+  - Data is automatically updated in the dashboard after synchronization.
+- **Visualization:**
+  - Dynamic tables for services, teams, and policies.
+  - Sidebar menu to navigate between entities.
+  - Professional style based on PagerDuty's color palette.
 - **Backend:**
-  - Endpoints REST para `/api/v1/services`, `/api/v1/teams`, `/api/v1/escalation-policies`.
-  - Endpoint de sincronización: `/sync/pagerduty` (POST).
+  - REST endpoints for `/api/v1/services`, `/api/v1/teams`, `/api/v1/escalation-policies`.
+  - Synchronization endpoint: `/sync/pagerduty` (POST).
 - **Frontend:**
-  - React + Material UI + DataGrid para visualización moderna.
-  - Proxy configurado para consumir el backend desde el frontend.
+  - React + Material UI + DataGrid for modern visualization.
+  - Proxy configured to consume the backend from the frontend.
 
-## Desarrollo y pruebas
-- Para desarrollo local del frontend:
+## Development and Testing
+- For local frontend development:
   ```
   cd frontend
   npm install
   npm start
   ```
-- Para desarrollo local del backend:
+- For local backend development:
   ```
   ./mvnw spring-boot:run
   ```
-- Los tests se ejecutan con:
+- Run tests with:
   ```
   ./mvnw test
   ```
 
-## Seguridad
-- Las credenciales y tokens deben ir en `.env` y nunca subirse al repositorio.
-- El backend valida y maneja errores de la API de PagerDuty.
+## Security
+- Credentials and tokens must be placed in `.env` and never committed to the repository.
+- The backend validates and handles errors from the PagerDuty API.
 
-## Notas adicionales
-- Si tienes problemas con dependencias en el frontend, asegúrate de que el archivo `.dockerignore` incluya `node_modules` y `build`.
-- Puedes personalizar el dashboard modificando `frontend/src/App.js`.
-- La base de datos se persiste en el volumen Docker `mysqldata`.
+## Additional Notes
+- If you have issues with frontend dependencies, make sure `.dockerignore` includes `node_modules` and `build`.
+- You can customize the dashboard by editing `frontend/src/App.js`.
+- The database is persisted in the Docker volume `mysqldata`.
 
-## Contacto y soporte
-Para dudas, sugerencias o soporte, contacta al equipo de desarrollo o revisa la documentación oficial de PagerDuty.
+## Contact & Support
+For questions, suggestions, or support, contact the development team or refer to the official PagerDuty documentation.
