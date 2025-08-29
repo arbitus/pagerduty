@@ -4,7 +4,8 @@ WORKDIR /app
 # Copia el wrapper de Maven y los archivos fuente
 COPY . .
 # Compila el proyecto
-RUN ./mvnw clean package -DskipTests
+RUN chmod +x ./mvnw
+RUN ./mvnw clean package
 
 # Segunda etapa: solo el JRE y el JAR generado
 FROM eclipse-temurin:21-jre-alpine
