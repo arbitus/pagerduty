@@ -22,7 +22,6 @@ public class ApiExceptionHandler {
         body.setStatus(HttpStatus.UNAUTHORIZED.value());
         body.setError(HttpStatus.UNAUTHORIZED.getReasonPhrase());
         body.setMessage(ex.getMessage());
-        // body.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
@@ -34,7 +33,6 @@ public class ApiExceptionHandler {
         body.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         body.setError(HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase());
         body.setMessage(ex.getMessage());
-        // body.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(body);
     }
 
@@ -46,7 +44,6 @@ public class ApiExceptionHandler {
         body.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         body.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         body.setMessage("Internal error: " + ex.getMessage());
-        // body.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }

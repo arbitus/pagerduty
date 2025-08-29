@@ -1,5 +1,3 @@
-// Funciones para llamadas a la API y manejo de errores
-
 export async function fetchApi(endpoint, options = {}) {
     const res = await fetch(endpoint, options);
     let data = null;
@@ -8,7 +6,6 @@ export async function fetchApi(endpoint, options = {}) {
         const text = await res.text();
         try {
             const errorJson = JSON.parse(text);
-            // Traducción de mensaje de autorización
             if (errorJson.message === "Unauthorized to access PagerDuty API") {
                 error = "No autorizado: revisa tu token de acceso";
             } else {

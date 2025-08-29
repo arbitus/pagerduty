@@ -65,10 +65,8 @@ public class PagerDutyClient {
                                                                         new RuntimeException(
                                                                                         "PagerDuty API server error")))
                                         .bodyToMono(ServiceResponseDto.class)
-                                        .block(); // Si usas programación reactiva, devuelve el Mono y maneja el flujo
-                                                  // fuera de aquí
+                                        .block();
                 } catch (WebClientResponseException e) {
-                        // Puedes loggear el error aquí si lo deseas
                         throw new RuntimeException("Error calling PagerDuty API: " + e.getMessage(), e);
                 }
         }
