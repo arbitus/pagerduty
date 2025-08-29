@@ -6,32 +6,40 @@ import com.example.pagerduty.model.ServiceEntity;
 @Component
 public class ServiceMapper {
 
-    public ServiceResponseDto.ServiceDto toDto(ServiceEntity entity) {
-        ServiceResponseDto.ServiceDto dto = new ServiceResponseDto.ServiceDto();
+    public ServiceDto toDto(ServiceEntity entity) {
+        ServiceDto dto = new ServiceDto();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setSummary(entity.getSummary());
+        dto.setType(entity.getType());
         dto.setStatus(entity.getStatus());
-        dto.setCreated_at(entity.getCreatedAt());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setSelf(entity.getSelfUrl());
+        dto.setHtmlUrl(entity.getHtmlUrl());
+        dto.setAutoResolveTimeout(entity.getAutoResolveTimeout());
+        dto.setAcknowledgementTimeout(entity.getAcknowledgementTimeout());
+        dto.setAlertCreation(entity.getAlertCreation());
 
         if (entity.getEscalationPolicy() != null) {
-            ServiceResponseDto.EscalationPolicyDto ep = new ServiceResponseDto.EscalationPolicyDto();
+            EscalationPolicyDto ep = new EscalationPolicyDto();
             ep.setId(entity.getEscalationPolicy().getId());
             ep.setSummary(entity.getEscalationPolicy().getSummary());
             ep.setType("escalation_policy_reference");
-            ep.setHtml_url(entity.getEscalationPolicy().getHtmlUrl());
+            ep.setHtmlUrl(entity.getEscalationPolicy().getHtmlUrl());
             ep.setSelf(entity.getEscalationPolicy().getSelfUrl());
-            dto.setEscalation_policy(ep);
+            dto.setEscalationPolicy(ep);
         }
 
         if (entity.getTeams() != null) {
             dto.setTeams(entity.getTeams().stream().distinct().map(team -> {
-                ServiceResponseDto.TeamDto t = new ServiceResponseDto.TeamDto();
+                TeamDto t = new TeamDto();
                 t.setId(team.getId());
                 t.setSummary(team.getSummary());
                 t.setType("team_reference");
-                t.setHtml_url(team.getHtmlUrl());
+                t.setHtmlUrl(team.getHtmlUrl());
                 t.setSelf(team.getSelfUrl());
+                t.setName(team.getName());
+                t.setDescription(team.getDescription());
                 return t;
             }).toList());
         }

@@ -3,6 +3,7 @@ package com.example.pagerduty.pagerduty.controller;
 import com.example.pagerduty.repository.TeamRepository;
 import com.example.pagerduty.controller.TeamController;
 import com.example.pagerduty.model.TeamEntity;
+import com.example.pagerduty.dto.TeamMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,21 +21,30 @@ class TeamControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private TeamRepository teamRepository;
+    @MockBean
+    private TeamMapper teamMapper;
 
     @Test
     void testGetAllTeams() throws Exception {
         TeamEntity team = new TeamEntity();
         team.setId("team1");
         team.setSummary("Team");
-        Mockito.when(teamRepository.findAll()).thenReturn(Collections.singletonList(team));
+        org.springframework.data.domain.PageImpl<TeamEntity> page = new org.springframework.data.domain.PageImpl<>(
+                Collections.singletonList(team));
+        Mockito.when(teamRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(page);
+        com.example.pagerduty.dto.TeamDto dto = new com.example.pagerduty.dto.TeamDto();
+        dto.setId("team1");
+        dto.setSummary("Team");
+        Mockito.when(teamMapper.toDto(team)).thenReturn(dto);
         mockMvc.perform(get("/api/v1/teams"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("team1"));
+                .andExpect(jsonPath("$.content[0].id").value("team1"));
     }
 
     @Test
     void testUnauthorizedException() throws Exception {
-        Mockito.when(teamRepository.findAll())
+        Mockito.when(teamRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
                 .thenThrow(new com.example.pagerduty.exception.UnauthorizedException("Unauthorized access"));
         mockMvc.perform(get("/api/v1/teams"))
                 .andExpect(status().isUnauthorized());
@@ -42,7 +52,7 @@ class TeamControllerTest {
 
     @Test
     void testTooManyRequestsException() throws Exception {
-        Mockito.when(teamRepository.findAll())
+        Mockito.when(teamRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
                 .thenThrow(new com.example.pagerduty.exception.TooManyRequestsException("Rate limit exceeded"));
         mockMvc.perform(get("/api/v1/teams"))
                 .andExpect(status().isTooManyRequests());

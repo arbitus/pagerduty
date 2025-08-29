@@ -2,7 +2,6 @@ package com.example.pagerduty.controller;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +13,6 @@ public class PagerDutyController {
 
     private final PagerDutySyncService syncService;
 
-    @Autowired
     public PagerDutyController(PagerDutySyncService syncService) {
         this.syncService = syncService;
     }

@@ -32,12 +32,12 @@ class ServiceControllerTest {
                                 Collections.singletonList(service));
                 Mockito.when(serviceRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
                                 .thenReturn(page);
-                com.example.pagerduty.dto.ServiceResponseDto.ServiceDto dto = new com.example.pagerduty.dto.ServiceResponseDto.ServiceDto();
+                com.example.pagerduty.dto.ServiceDto dto = new com.example.pagerduty.dto.ServiceDto();
                 dto.setId("svc1");
                 dto.setName("Service 1");
                 Mockito.when(serviceMapper.toDto(Mockito.any(ServiceEntity.class))).thenReturn(dto);
                 mockMvc.perform(get("/api/v1/services"))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.services[0].id").value("svc1"));
+                                .andExpect(jsonPath("$.content[0].id").value("svc1"));
         }
 }
