@@ -2,6 +2,9 @@ package com.example.pagerduty.service;
 
 import com.example.pagerduty.client.PagerDutyClient;
 import com.example.pagerduty.dto.ServiceResponseDto;
+import com.example.pagerduty.dto.ServiceDto;
+import com.example.pagerduty.dto.TeamDto;
+import com.example.pagerduty.dto.EscalationPolicyDto;
 import com.example.pagerduty.model.EscalationPolicyEntity;
 import com.example.pagerduty.model.ServiceEntity;
 import com.example.pagerduty.model.TeamEntity;
@@ -44,25 +47,7 @@ public class PagerDutySyncService {
 
         while (more) {
             ServiceResponseDto response = client.getServices(limit, offset);
-            for (ServiceResponseDto.ServiceDto dto : response.getServices()) {
-
-                // Escalation Policy Upsert
-                EscalationPolicyEntity policy = escalationPolicyRepository
-                        .findById(dto.getEscalation_policy().getId())
-                        .orElseGet(EscalationPolicyEntity::new);
-
-                boolean newPolicy = (policy.getId() == null);
-                policy.setId(dto.getEscalation_policy().getId());
-                policy.setSummary(dto.getEscalation_policy().getSummary());
-                policy.setType(dto.getEscalation_policy().getType());
-                policy.setSelfUrl(dto.getEscalation_policy().getSelf());
-                policy.setHtmlUrl(dto.getEscalation_policy().getHtml_url());
-                escalationPolicyRepository.save(policy);
-
-                if (newPolicy)
-                    policiesCreated++;
-                else
-                    policiesUpdated++;
+            for (ServiceDto dto : response.getServices()) {
 
                 // Service Upsert
                 ServiceEntity service = serviceRepository.findById(dto.getId())
@@ -73,19 +58,50 @@ public class PagerDutySyncService {
                 service.setSummary(dto.getSummary());
                 service.setType(dto.getType());
                 service.setSelfUrl(dto.getSelf());
-                service.setHtmlUrl(dto.getHtml_url());
+                service.setHtmlUrl(dto.getHtmlUrl());
                 service.setStatus(dto.getStatus());
-                service.setAutoResolveTimeout(dto.getAuto_resolve_timeout());
-                service.setAcknowledgementTimeout(dto.getAcknowledgement_timeout());
-                service.setAlertCreation(dto.getAlert_creation());
-                service.setCreatedAt(dto.getCreated_at());
-                service.setEscalationPolicy(policy);
+                service.setAutoResolveTimeout(dto.getAutoResolveTimeout());
+                service.setAcknowledgementTimeout(dto.getAcknowledgementTimeout());
+                service.setAlertCreation(dto.getAlertCreation());
+                service.setCreatedAt(dto.getCreatedAt());
+
+                // Escalation Policy Upsert
+                EscalationPolicyDto escalationPolicyDto = dto.getEscalationPolicy();
+                if (escalationPolicyDto == null) {
+                    System.out.println("[SYNC] Service " + dto.getId() + " has no escalation policy DTO");
+                } else if (escalationPolicyDto.getId() == null || escalationPolicyDto.getId().isEmpty()) {
+                    System.out.println(
+                            "[SYNC] Service " + dto.getId() + " has escalation policy DTO but ID is null or empty");
+                }
+                if (escalationPolicyDto != null && escalationPolicyDto.getId() != null
+                        && !escalationPolicyDto.getId().isEmpty()) {
+                    EscalationPolicyEntity policy = escalationPolicyRepository
+                            .findById(escalationPolicyDto.getId())
+                            .orElseGet(EscalationPolicyEntity::new);
+
+                    boolean newPolicy = (policy.getId() == null);
+                    policy.setId(escalationPolicyDto.getId());
+                    policy.setSummary(escalationPolicyDto.getSummary());
+                    policy.setType(escalationPolicyDto.getType());
+                    policy.setSelfUrl(escalationPolicyDto.getSelf());
+                    policy.setHtmlUrl(escalationPolicyDto.getHtmlUrl());
+                    escalationPolicyRepository.save(policy);
+
+                    if (newPolicy)
+                        policiesCreated++;
+                    else
+                        policiesUpdated++;
+                    service.setEscalationPolicy(policy);
+                } else {
+                    service.setEscalationPolicy(null);
+                    // Opcional: log.warn("Service " + dto.getId() + " has no escalation policy");
+                }
 
                 // Limpiar teams anteriores y re-asignar
                 service.getTeams().clear();
 
                 if (dto.getTeams() != null) {
-                    for (ServiceResponseDto.TeamDto t : dto.getTeams()) {
+                    for (TeamDto t : dto.getTeams()) {
                         TeamEntity team = teamRepository.findById(t.getId())
                                 .orElseGet(TeamEntity::new);
 
@@ -94,9 +110,9 @@ public class PagerDutySyncService {
                         team.setSummary(t.getSummary());
                         team.setType(t.getType());
                         team.setSelfUrl(t.getSelf());
-                        team.setHtmlUrl(t.getHtml_url());
-                        team.setName(t.getName()); // Mapping name from TeamDto to TeamEntity
-                        team.setDescription(t.getDescription()); // Mapping description from TeamDto to TeamEntity
+                        team.setHtmlUrl(t.getHtmlUrl());
+                        team.setName(t.getName());
+                        team.setDescription(t.getDescription());
                         teamRepository.save(team);
                         service.getTeams().add(team);
 

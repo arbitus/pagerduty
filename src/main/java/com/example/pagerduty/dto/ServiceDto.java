@@ -15,6 +15,7 @@ public class ServiceDto {
     private Integer acknowledgementTimeout;
     private String alertCreation;
     private Instant createdAt;
+    @com.fasterxml.jackson.annotation.JsonProperty("escalation_policy")
     private EscalationPolicyDto escalationPolicy;
     private List<TeamDto> teams;
 

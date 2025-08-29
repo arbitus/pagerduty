@@ -2,13 +2,12 @@ package com.example.pagerduty.service;
 
 import com.example.pagerduty.client.PagerDutyClient;
 import com.example.pagerduty.dto.ServiceResponseDto;
-import com.example.pagerduty.model.EscalationPolicyEntity;
-import com.example.pagerduty.model.ServiceEntity;
-import com.example.pagerduty.model.TeamEntity;
+import com.example.pagerduty.dto.ServiceDto;
+import com.example.pagerduty.dto.EscalationPolicyDto;
+import com.example.pagerduty.dto.TeamDto;
 import com.example.pagerduty.repository.EscalationPolicyRepository;
 import com.example.pagerduty.repository.ServiceRepository;
 import com.example.pagerduty.repository.TeamRepository;
-import com.example.pagerduty.service.PagerDutySyncService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,33 +39,33 @@ class PagerDutySyncServiceTest {
 
     @Test
     void testSyncPagerDutyProcessesServices() {
-        ServiceResponseDto.ServiceDto serviceDto = new ServiceResponseDto.ServiceDto();
+        ServiceDto serviceDto = new ServiceDto();
         serviceDto.setId("svc1");
         serviceDto.setName("Service 1");
         serviceDto.setSummary("Summary");
         serviceDto.setType("type");
         serviceDto.setSelf("self");
-        serviceDto.setHtml_url("html");
+        serviceDto.setHtmlUrl("html");
         serviceDto.setStatus("active");
-        serviceDto.setAuto_resolve_timeout(10);
-        serviceDto.setAcknowledgement_timeout(5);
-        serviceDto.setAlert_creation("alert");
-        serviceDto.setCreated_at(Instant.now());
+        serviceDto.setAutoResolveTimeout(10);
+        serviceDto.setAcknowledgementTimeout(5);
+        serviceDto.setAlertCreation("alert");
+        serviceDto.setCreatedAt(Instant.now());
 
-        ServiceResponseDto.EscalationPolicyDto policyDto = new ServiceResponseDto.EscalationPolicyDto();
+        EscalationPolicyDto policyDto = new EscalationPolicyDto();
         policyDto.setId("ep1");
         policyDto.setSummary("Policy");
         policyDto.setType("type");
         policyDto.setSelf("self");
-        policyDto.setHtml_url("html");
-        serviceDto.setEscalation_policy(policyDto);
+        policyDto.setHtmlUrl("html");
+        serviceDto.setEscalationPolicy(policyDto);
 
-        ServiceResponseDto.TeamDto teamDto = new ServiceResponseDto.TeamDto();
+        TeamDto teamDto = new TeamDto();
         teamDto.setId("team1");
         teamDto.setSummary("Team");
         teamDto.setType("type");
         teamDto.setSelf("self");
-        teamDto.setHtml_url("html");
+        teamDto.setHtmlUrl("html");
         serviceDto.setTeams(Collections.singletonList(teamDto));
 
         ServiceResponseDto responseDto = new ServiceResponseDto();
