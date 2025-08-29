@@ -31,4 +31,20 @@ class TeamControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("team1"));
     }
+
+    @Test
+    void testUnauthorizedException() throws Exception {
+        Mockito.when(teamRepository.findAll())
+                .thenThrow(new com.example.pagerduty.exception.UnauthorizedException("Unauthorized access"));
+        mockMvc.perform(get("/api/v1/teams"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void testTooManyRequestsException() throws Exception {
+        Mockito.when(teamRepository.findAll())
+                .thenThrow(new com.example.pagerduty.exception.TooManyRequestsException("Rate limit exceeded"));
+        mockMvc.perform(get("/api/v1/teams"))
+                .andExpect(status().isTooManyRequests());
+    }
 }

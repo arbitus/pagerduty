@@ -16,23 +16,43 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(EscalationPolicyController.class)
 class EscalationPolicyControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private EscalationPolicyRepository escalationPolicyRepository;
+        @Autowired
+        private MockMvc mockMvc;
+        @MockBean
+        private EscalationPolicyRepository escalationPolicyRepository;
 
-    @Test
-    void testGetAllEscalationPolicies() throws Exception {
-        EscalationPolicyEntity policy = new EscalationPolicyEntity();
-        policy.setId("ep1");
-        policy.setSummary("Policy");
-        org.springframework.data.domain.PageImpl<EscalationPolicyEntity> page = new org.springframework.data.domain.PageImpl<>(
-                Collections.singletonList(policy));
-        Mockito.when(escalationPolicyRepository
-                .findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
-                .thenReturn(page);
-        mockMvc.perform(get("/api/v1/escalation-policies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id").value("ep1"));
-    }
+        @Test
+        void testGetAllEscalationPolicies() throws Exception {
+                EscalationPolicyEntity policy = new EscalationPolicyEntity();
+                policy.setId("ep1");
+                policy.setSummary("Policy");
+                org.springframework.data.domain.PageImpl<EscalationPolicyEntity> page = new org.springframework.data.domain.PageImpl<>(
+                                Collections.singletonList(policy));
+                Mockito.when(escalationPolicyRepository
+                                .findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                                .thenReturn(page);
+                mockMvc.perform(get("/api/v1/escalation-policies"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.content[0].id").value("ep1"));
+        }
+
+        @Test
+        void testUnauthorizedException() throws Exception {
+                Mockito.when(escalationPolicyRepository
+                                .findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                                .thenThrow(new com.example.pagerduty.exception.UnauthorizedException(
+                                                "Unauthorized access"));
+                mockMvc.perform(get("/api/v1/escalation-policies"))
+                                .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void testTooManyRequestsException() throws Exception {
+                Mockito.when(escalationPolicyRepository
+                                .findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                                .thenThrow(new com.example.pagerduty.exception.TooManyRequestsException(
+                                                "Rate limit exceeded"));
+                mockMvc.perform(get("/api/v1/escalation-policies"))
+                                .andExpect(status().isTooManyRequests());
+        }
 }

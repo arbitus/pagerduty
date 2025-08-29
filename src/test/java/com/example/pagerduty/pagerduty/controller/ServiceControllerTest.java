@@ -16,28 +16,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ServiceController.class)
 class ServiceControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private ServiceRepository serviceRepository;
-    @MockBean
-    private com.example.pagerduty.dto.ServiceMapper serviceMapper;
+        @Autowired
+        private MockMvc mockMvc;
+        @MockBean
+        private ServiceRepository serviceRepository;
+        @MockBean
+        private com.example.pagerduty.dto.ServiceMapper serviceMapper;
 
-    @Test
-    void testGetAllServices() throws Exception {
-        ServiceEntity service = new ServiceEntity();
-        service.setId("svc1");
-        service.setName("Service 1");
-        org.springframework.data.domain.PageImpl<ServiceEntity> page = new org.springframework.data.domain.PageImpl<>(
-                Collections.singletonList(service));
-        Mockito.when(serviceRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
-                .thenReturn(page);
-        com.example.pagerduty.dto.ServiceResponseDto.ServiceDto dto = new com.example.pagerduty.dto.ServiceResponseDto.ServiceDto();
-        dto.setId("svc1");
-        dto.setName("Service 1");
-        Mockito.when(serviceMapper.toDto(Mockito.any(ServiceEntity.class))).thenReturn(dto);
-        mockMvc.perform(get("/api/v1/services"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.services[0].id").value("svc1"));
-    }
+        @Test
+        void testGetAllServices() throws Exception {
+                ServiceEntity service = new ServiceEntity();
+                service.setId("svc1");
+                service.setName("Service 1");
+                org.springframework.data.domain.PageImpl<ServiceEntity> page = new org.springframework.data.domain.PageImpl<>(
+                                Collections.singletonList(service));
+                Mockito.when(serviceRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                                .thenReturn(page);
+                com.example.pagerduty.dto.ServiceResponseDto.ServiceDto dto = new com.example.pagerduty.dto.ServiceResponseDto.ServiceDto();
+                dto.setId("svc1");
+                dto.setName("Service 1");
+                Mockito.when(serviceMapper.toDto(Mockito.any(ServiceEntity.class))).thenReturn(dto);
+                mockMvc.perform(get("/api/v1/services"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.services[0].id").value("svc1"));
+        }
+
+        @Test
+        void testUnauthorizedException() throws Exception {
+                Mockito.when(serviceRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                                .thenThrow(new com.example.pagerduty.exception.UnauthorizedException(
+                                                "Unauthorized access"));
+                mockMvc.perform(get("/api/v1/services"))
+                                .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void testTooManyRequestsException() throws Exception {
+                Mockito.when(serviceRepository.findAll(Mockito.any(org.springframework.data.domain.Pageable.class)))
+                                .thenThrow(new com.example.pagerduty.exception.TooManyRequestsException(
+                                                "Rate limit exceeded"));
+                mockMvc.perform(get("/api/v1/services"))
+                                .andExpect(status().isTooManyRequests());
+        }
 }
